@@ -1,12 +1,55 @@
-# React + Vite
+### README Frontend (`README-frontend.md`)
+```markdown
+# Frontend - React CRUD Productos y Usuarios
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Descripción
+Aplicación frontend desarrollada con **React** y **Vite** que consume una API REST backend para manejar CRUDs de productos y usuarios. Utiliza axios para la comunicación HTTP y una librería UI para el diseño.
 
-Currently, two official plugins are available:
+## Tecnologías
+- React + Vite
+- Axios
+- Librería UI: Bootstrap (React-Bootstrap) / Tailwind CSS / PrimeReact (usar según elección)
+- jspdf para exportar PDFs
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Funcionalidades
+- **CRUD Productos**
+  - Mostrar listado de productos
+  - Formulario para crear producto
+  - Editar producto con formulario
+  - Eliminar producto con botón
 
-## Expanding the ESLint configuration
+- **CRUD Usuarios**
+  - Listado de usuarios (nombre, email, edad)
+  - Crear, editar y eliminar usuarios con formularios y botones
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Exportación a PDF**
+  - Botones para exportar listado de productos y listado de usuarios en formato PDF ordenado (tablas)
+
+- **UI**
+  - Componentes separados o pestañas para productos y usuarios
+  - Diseño organizado, con colores, márgenes y botones bien definidos
+
+## Instalación y ejecución
+1. Clonar el repositorio:
+   ```bash
+   git clone <url-del-repositorio>
+   cd frontend
+
+2. Instalar dependencias:
+    npm install
+
+3. Ejecutar la app:
+    npm run dev
+
+### Uso
+- Navegar entre pestañas de Productos y Usuarios.
+
+- Crear, editar y eliminar registros.
+
+- Exportar los listados a PDF con los botones correspondientes.
+
+### Notas
+- La UI utiliza [indicar la librería usada: React-Bootstrap, Tailwind CSS o PrimeReact].
+
+- Para la exportación a PDF se usa la librería jspdf.
+
