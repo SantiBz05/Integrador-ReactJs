@@ -1,21 +1,47 @@
 import { Link } from 'react-router-dom';
 import { Button } from 'primereact/button'; 
+import { Card } from 'primereact/card';
+import { Divider } from 'primereact/divider';
+import { Ripple } from 'primereact/ripple';
+import { motion } from 'framer-motion';
+import { FaUsers, FaBoxOpen } from 'react-icons/fa';
 
 const HomeView = () => {
   return (
-    <div style={{ textAlign: 'center', padding: '20px' }}>
-      <h1>Bienvenido al CRUD de productos y usuarios</h1>
-      <h4>(aplicación fullstack en JavaScript donde el frontend (React) consume los datos expuestos por el backend (Express), permitiendo realizar CRUDs completos)</h4>
-      <div>
-        <Link to="/usuarios">
-          <Button label="Ir a Usuarios" />
-        </Link>
+    <motion.div 
+      initial={{ opacity: 0, y: 50 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ duration: 0.8 }}
+      style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}
+    >
+      <Card 
+        title="Bienvenido a mi Fantabuloso Trabajo 🎉"
+        subTitle="CRUD Usuarios y Productos"
+        style={{ width: '400px', textAlign: 'center', boxShadow: '0 8px 16px rgba(0,0,0,0.1)', borderRadius: '20px' }}
+      >
+        <Divider />
+        <div className="p-d-flex p-flex-column p-ai-center" style={{ gap: '1rem' }}>
+          <Link to="/usuarios">
+            <Button 
+              label="Ir a Usuarios" 
+              icon={<FaUsers />} 
+              className="p-button-raised p-button-info" 
+              style={{ width: '100%' }} 
+            />
+          </Link>
 
-        <Link to="/productos">
-          <Button label="Ir a Productos" />
-        </Link>
-      </div>
-    </div>
+          <Link to="/productos">
+            <Button 
+              label="Ir a Productos" 
+              icon={<FaBoxOpen />} 
+              className="p-button-raised p-button-success" 
+              style={{ width: '100%' }} 
+            />
+          </Link>
+        </div>
+        <Ripple />
+      </Card>
+    </motion.div>
   );
 };
 

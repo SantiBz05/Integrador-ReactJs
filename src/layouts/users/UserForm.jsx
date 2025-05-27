@@ -1,156 +1,147 @@
-// import React, { useState, useContext, useEffect } from "react";
-// import { UnicornContext } from "../context/UnicornContext";
-// import { Button } from 'primereact/button';
-// import { DataTable } from 'primereact/datatable';
-// import { Column } from 'primereact/column';
-// import { Formik, Form, Field, ErrorMessage } from 'formik';
-// import * as Yup from 'yup';
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useUserContext } from "../../context/UserContext"; 
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Button } from "primereact/button";
+import { Card } from "primereact/card";
 
-// const UnicornsForm = () => {
-//     const { unicorns, handleAddUnicorn, handleEditUnicorn, handleDeleteUnicorn } = useContext(UnicornContext);
-//     const [editingUnicorn, setEditingUnicorn] = useState(null);
+const validationSchema = Yup.object({
+  name: Yup.string().required("El nombre es obligatorio"),
+  lastname: Yup.string().required("El apellido es obligatorio"),
+  email: Yup.string()
+    .email("Debe ser un email válido")
+    .required("El email es obligatorio"),
+  age: Yup.number()
+    .required("La edad es obligatoria")
+    .positive("La edad debe ser positiva")
+    .integer("La edad debe ser un número entero"),
+});
 
-//     // Estado de initialValues
-//     const [initialValues, setInitialValues] = useState({
-//         name: '',
-//         color: '',
-//         age: '',
-//         power: ''
-//     });
+export default function UsersForm() {
+  const { users, addUser, editUser } = useUserContext();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isEdit = Boolean(id);
 
-//     // Iniciar edición
-//     const startEdit = (unicorn) => {
-//         console.log('Editando unicornio:', unicorn);  // Ver qué unicornio se está editando
-//         setEditingUnicorn(unicorn);
-//     };
+  const [initialValues, setInitialValues] = useState({
+    name: "",
+    lastname: "",
+    email: "",
+    age: "",
+  });
 
-//     // Cuando editingUnicorn cambie, actualizar initialValues
-//     useEffect(() => {
-//         if (editingUnicorn) {
-//             console.log('Unicornio para editar:', editingUnicorn);  // Ver el unicornio que se ha seleccionado para editar
-//             setInitialValues({
-//                 name: editingUnicorn.name,
-//                 color: editingUnicorn.data?.color || '', // Asegúrate de acceder a data.color
-//                 age: editingUnicorn.data?.age || '', // Asegúrate de acceder a data.age
-//                 power: editingUnicorn.data?.power || '' // Asegúrate de acceder a data.power
-//             });
-//         }
-//     }, [editingUnicorn]);
+  useEffect(() => {
+    if (isEdit) {
+      const user = users.find((u) => u.id === Number(id));
+      if (user) {
+        setInitialValues({
+          name: user.name || "",
+          lastname: user.lastname || "",
+          email: user.email || "",
+          age: user.age || "",
+        });
+      } else {
+        navigate("/usuarios");
+      }
+    } else {
+      setInitialValues({ name: "", lastname: "", email: "", age: "" });
+    }
+  }, [id, isEdit, users, navigate]);
 
-//     const validationSchema = Yup.object({
-//         name: Yup.string()
-//             .min(6, 'Debe tener mínimo 6 caracteres')
-//             .max(20, 'Debe tener menos de 20 caracteres')
-//             .required('Nombre es obligatorio'),
-//         age: Yup.number()
-//             .required('Edad es obligatorio'),
-//         color: Yup.string()
-//             .required('Color es obligatorio'),
-//         power: Yup.string()
-//             .required('Poder es obligatorio'),
-//     });
+  const handleSubmit = async (values, { resetForm }) => {
+    if (isEdit) {
+      await editUser(Number(id), values);
+    } else {
+      await addUser(values);
+    }
+    resetForm();
+    navigate("/usuarios");
+  };
 
-//     const actionBodyTemplate = (rowData) => (
-//         <div className="flex gap-2">
-//             <Button
-//                 label="Editar"
-//                 icon="pi pi-pencil"
-//                 onClick={() => startEdit(rowData)}
-//                 style={{
-//                     backgroundColor: '#f0ad4e',
-//                     border: 'none',
-//                     color: '#000',
-//                 }}
-//             />
-//         </div>
-//     );
+  return (
+    <div className="flex justify-content-center mt-5">
+      <Card
+        title={isEdit ? "Editar usuario" : "Agregar usuario"}
+        className="w-full sm:w-10 md:w-6 lg:w-4 shadow-4"
+      >
+        <Formik
+          initialValues={initialValues}
+          enableReinitialize
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          <Form className="formgrid grid p-fluid">
+            <div className="field col-12">
+              <label htmlFor="name" className="block text-900 font-medium mb-2">
+                Nombre
+              </label>
+              <Field
+                id="name"
+                name="name"
+                className="p-inputtext w-full"
+                placeholder="Nombre"
+              />
+              <ErrorMessage name="name" component="div" className="text-red-500 text-sm mt-1" />
+            </div>
 
-//     return (
-//         <div
-//             className="p-6"
-//             style={{ backgroundColor: '#121212', minHeight: '100vh', color: '#ffffff' }}
-//         >
-//             <h2 className="text-2xl mb-8"> 🦄 Gestión de Unicornios</h2>
+            <div className="field col-12">
+              <label htmlFor="lastname" className="block text-900 font-medium mb-2">
+                Apellido
+              </label>
+              <Field
+                id="lastname"
+                name="lastname"
+                className="p-inputtext w-full"
+                placeholder="Apellido"
+              />
+              <ErrorMessage name="lastname" component="div" className="text-red-500 text-sm mt-1" />
+            </div>
 
-//             {/* Formulario */}
-//             <Formik
-//                 initialValues={initialValues}
-//                 validationSchema={validationSchema}
-//                 onSubmit={(values, { resetForm }) => {
-//                     console.log('Formulario enviado con los siguientes valores:', values); // Ver los valores al enviar el formulario
-//                     if (editingUnicorn) {
-//                         // Agregar el _id al enviar los valores de edición
-//                         const unicornWithId = {
-//                             _id: editingUnicorn._id,  // Asegúrate de agregar el _id aquí
-//                             ...values,
-//                         };
-//                         handleEditUnicorn(unicornWithId);  // Editar unicornio
-//                     } else {
-//                         handleAddUnicorn(values);   // Agregar nuevo unicornio
-//                     }
-//                     // Limpiar el formulario después de la acción
-//                     resetForm();  // Esto restablece los valores a initialValues
-//                     // Limpiar el estado de edición
-//                     setEditingUnicorn(null);
-//                     // Restablecer initialValues a sus valores vacíos después de un submit
-//                     setInitialValues({
-//                         name: '',
-//                         color: '',
-//                         age: '',
-//                         power: ''
-//                     });
-//                 }}
-//                 enableReinitialize
-//             >
-//                 <Form>
-//                     <div>
-//                         <label>Nombre</label>
-//                         <Field name="name" />
-//                         <ErrorMessage name="name" component="div" />
-//                     </div>
-//                     <div>
-//                         <label>Edad</label>
-//                         <Field name="age" />
-//                         <ErrorMessage name="age" component="div" />
-//                     </div>
-//                     <div>
-//                         <label>Color</label>
-//                         <Field name="color" />
-//                         <ErrorMessage name="color" component="div" />
-//                     </div>
-//                     <div>
-//                         <label>Poder</label>
-//                         <Field name="power" />
-//                         <ErrorMessage name="power" component="div" />
-//                     </div>
-//                     <Button
-//                         style={{ color: 'white' }}
-//                         label={editingUnicorn ? 'Editar unicornio' : 'Crear unicornio'}
-//                         type="submit"
-//                     />
-//                 </Form>
-//             </Formik>
+            <div className="field col-12">
+              <label htmlFor="email" className="block text-900 font-medium mb-2">
+                Email
+              </label>
+              <Field
+                id="email"
+                name="email"
+                type="email"
+                className="p-inputtext w-full"
+                placeholder="Email"
+              />
+              <ErrorMessage name="email" component="div" className="text-red-500 text-sm mt-1" />
+            </div>
 
-//             {/* Tabla */}
-//             <div style={{ marginTop: '2rem' }}>
-//                 <DataTable
-//                     value={unicorns}
-//                     tableStyle={{ minWidth: '50rem' }}
-//                     className="p-datatable-sm"
-//                 >
-//                     <Column field="name" header="Nombre" style={{ color: '#fff' }} />
-//                     <Column field="data.age" header="Edad" />
-//                     <Column field="data.color" header="Color" />
-//                     <Column field="data.power" header="Poder" />
-//                     <Column
-//                         body={actionBodyTemplate}
-//                         header="Acciones"
-//                         style={{ width: '12rem' }}
-//                     />
-//                 </DataTable>
-//             </div>
-//         </div>
-//     );
-// };
+            <div className="field col-12">
+              <label htmlFor="age" className="block text-900 font-medium mb-2">
+                Edad
+              </label>
+              <Field
+                id="age"
+                name="age"
+                type="number"
+                className="p-inputtext w-full"
+                placeholder="Edad"
+              />
+              <ErrorMessage name="age" component="div" className="text-red-500 text-sm mt-1" />
+            </div>
 
-// export default UnicornsForm;
+            <div className="col-12 flex justify-content-between mt-4">
+              <Button
+                type="submit"
+                label={isEdit ? "Guardar cambios" : "Agregar"}
+                className="p-button-success"
+              />
+              <Button
+                label="Volver"
+                className="p-button-secondary"
+                onClick={() => navigate("/usuarios")}
+                type="button"
+              />
+            </div>
+          </Form>
+        </Formik>
+      </Card>
+    </div>
+  );
+}

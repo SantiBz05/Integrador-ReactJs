@@ -5,24 +5,26 @@ export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const [users, setUsers] = useState([]);
+    
     const API_URL = "http://localhost:3000/usuarios";
 
     const getUsers = async () => {
         try {
             const { data } = await axios.get(API_URL);
-            setUsers(data);
+            const userList = Array.isArray(data?.data) ? data.data : data;
+            setUsers(userList);
         } catch (error) {
             console.error("Error al obtener usuarios", error);
             alert("Error al obtener los usuarios.");
         }
     };
 
-    const handleAddUser = async ({ name, color, age, power }) => {
+    const addUser = async ({ name, lastname ,email, age }) => {
         try {
-            const { data: created } = await axios.post(API_URL, {
-                name,
-                data: { color, age: Number(age), power },
+            const { data } = await axios.post(API_URL, {
+                name, lastname ,email, age
             });
+            const created = Array.isArray(data?.data) ? data.data[0] : data.data || data;
             setUsers((prevUsers) => [...prevUsers, created]);
         } catch (error) {
             console.error("Error al añadir el usuario", error);
@@ -30,15 +32,14 @@ export const UserProvider = ({ children }) => {
         }
     };
 
-    const handleEditUser = async ({ _id, name, color, age, power }) => {
+    const editUser = async (id, { name, lastname ,email, age }) => {
         try {
-            await axios.put(`${API_URL}/${_id}`, {
-                name,
-                data: { color, age: Number(age), power },
+            await axios.put(`${API_URL}/${id}`, {
+                name, lastname ,email, age
             });
             setUsers((prev) =>
                 prev.map((u) =>
-                    u._id === _id ? { ...u, name, data: { color, age, power } } : u
+                    u.id === id ? { ...u, name, lastname ,email, age } : u
                 )
             );
         } catch (error) {
@@ -47,10 +48,10 @@ export const UserProvider = ({ children }) => {
         }
     };
 
-    const handleDeleteUser = async (id) => {
+    const deleteUser = async (id) => {
         try {
             await axios.delete(`${API_URL}/${id}`);
-            setUsers((prevUsers) => prevUsers.filter((user) => user._id !== id));
+            setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
         } catch (error) {
             console.error("Error al eliminar el usuario", error);
             alert("Error al eliminar el usuario.");
@@ -66,9 +67,9 @@ export const UserProvider = ({ children }) => {
             value={{
                 users,
                 getUsers,
-                handleAddUser,
-                handleEditUser,
-                handleDeleteUser,
+                addUser,
+                editUser,
+                deleteUser,
             }}
         >
             {children}

@@ -3,16 +3,13 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Home from './layouts/home/index';
 
-import ProductRoutes from './layouts/products/index'; 
-import { ProductProvider } from './context/ProductCotext'
+import ProductsModule from './layouts/products/index';
+import { ProductProvider } from './context/ProductContext'
 
-// import UserRoutes from './layouts/users/index'; 
-// import { UserProvider } from './context/UserContext'
+import UsersModule from './layouts/users/index'; 
+import { UserProvider } from './context/UserContext'
 
 import './App.css';
-import 'primereact/resources/themes/lara-dark-indigo/theme.css';
-import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css';
 
 function App() {
   return (
@@ -24,18 +21,18 @@ function App() {
             path="/productos/*"
             element={
               <ProductProvider>
-                <ProductRoutes />
+                <ProductsModule />
               </ProductProvider>
             }
           />
-          {/* <Route
+          <Route
             path="/usuarios/*"
             element={
               <UserProvider>
-                <UserRoutes />
+                <UsersModule />
               </UserProvider>
             }
-          /> */}
+          />
         </Routes>
       </Fragment>
     </Router>

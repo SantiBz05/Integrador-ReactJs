@@ -1,51 +1,33 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-export const exportToPDF = (data, title) => {
+export const exportToPDF = (data, title, columns) => {
   const doc = new jsPDF();
 
-  // Título
   doc.setFontSize(16);
-  doc.setTextColor(91, 33, 182);
-  doc.text(` Lista de ${title}`, 14, 15);
+  doc.setTextColor(40, 40, 40);
+  doc.text(`Lista de ${title}`, 14, 15);
 
-  // Definimos las columnas y armamos las filas
-  const columns = ['Nombre', 'Color', 'Edad', 'Poder'];
-  const tableRows = data.map(unicornio => [
-    unicornio.name,
-    unicornio.data.color,
-    unicornio.data.age,
-    unicornio.data.power
-  ]);
+  const tableRows = data.map(item => columns.map(col => item[col]));
 
   autoTable(doc, {
     head: [columns],
     body: tableRows,
     startY: 25,
-    styles: {
-      fontSize: 11,
-      textColor: [40, 40, 40],
-      halign: 'center',
-      valign: 'middle',
-      lineColor: [220, 220, 220],
-      lineWidth: 0.1,
-    },
-    headStyles: {
-      fillColor: [244, 143, 177], // rosa claro
-      textColor: 255,
-      fontStyle: 'bold',
-    },
-    alternateRowStyles: {
-      fillColor: [255, 245, 248]
-    },
-    margin: { top: 25 }
+    styles: { fontSize: 10, textColor: 33 },
+    headStyles: { fillColor: [51, 134, 255], textColor: 255 },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+    margin: { left: 14, right: 14 }
   });
 
-  // Pie de página
-  const fecha = new Date().toLocaleDateString();
-  doc.setFontSize(10);
+  const pageHeight = doc.internal.pageSize.height;
+  const footerY = pageHeight - 15;
+
+  doc.setFontSize(9);
   doc.setTextColor(150);
-  doc.text(`Generado el ${fecha}`, 14, doc.internal.pageSize.height - 10);
+
+  doc.text(`Generado el ${new Date().toLocaleDateString()}`, 14, footerY);
+  doc.text("Santiago Baez", 14, footerY + 5);
 
   doc.save(`${title}.pdf`);
 };
