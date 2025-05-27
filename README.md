@@ -1,5 +1,3 @@
-### README Frontend (`README-frontend.md`)
-```markdown
 # Frontend - React CRUD Productos y Usuarios
 
 ## Descripción
