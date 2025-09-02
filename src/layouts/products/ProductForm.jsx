@@ -8,9 +8,11 @@ import { Card } from "primereact/card";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("El nombre del producto es obligatorio"),
+
   price: Yup.number()
     .required("El precio es obligatorio")
     .positive("Debe ser un número positivo"),
+    
   color: Yup.string().required("El color es obligatorio"),
 });
 

@@ -9,33 +9,41 @@ import { ProductProvider } from './context/ProductContext'
 import UsersModule from './layouts/users/index'; 
 import { UserProvider } from './context/UserContext'
 
+import { AuthProvider } from './context/AuthContext';
+import LoginForm from './layouts/auth/LoginForm';
+import RegisterForm from './layouts/auth/RegisterForm';
+
 import './App.css';
 
 function App() {
   return (
     <Router>
-      <Fragment>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/productos/*"
-            element={
-              <ProductProvider>
-                <ProductsModule />
-              </ProductProvider>
-            }
-          />
-          <Route
-            path="/usuarios/*"
-            element={
-              <UserProvider>
-                <UsersModule />
-              </UserProvider>
-            }
-          />
-        </Routes>
-      </Fragment>
-    </Router>
+        <AuthProvider>
+          <Fragment>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path='/inicio-sesion' element={<LoginForm/>}/>
+              <Route path='/registro' element={<RegisterForm/>}/>
+              <Route
+                path="/productos/*"
+                element={
+                  <ProductProvider>
+                    <ProductsModule />
+                  </ProductProvider>
+                }
+              />
+              <Route
+                path="/usuarios/*"
+                element={
+                  <UserProvider>
+                    <UsersModule />
+                  </UserProvider>
+                }
+              />
+            </Routes>
+          </Fragment>
+        </AuthProvider>
+      </Router>
   );
 }
 

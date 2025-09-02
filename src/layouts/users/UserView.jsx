@@ -38,6 +38,8 @@ const UsersView = () => {
                 <Column field="lastname" header="Apellido" />
                 <Column field="email" header="Email" />
                 <Column field="age" header="Edad" />
+                <Column field="password" header="Contraseña" body={(rowData) => (<span> {'•'.repeat(rowData?.contrasenia?.length)} </span>)}/>
+                <Column field="role" header="Rol" />
                 <Column 
                     header="Acciones" 
                     body={(rowData) => (

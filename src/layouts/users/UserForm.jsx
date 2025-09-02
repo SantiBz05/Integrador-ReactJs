@@ -20,6 +20,7 @@ const validationSchema = Yup.object({
 
 export default function UsersForm() {
   const { users, addUser, editUser } = useUserContext();
+  const [showPassword, setShowPassword] = useState(false); 
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = Boolean(id);
@@ -28,6 +29,8 @@ export default function UsersForm() {
     name: "",
     lastname: "",
     email: "",
+    password: "",
+    role: "customer",
     age: "",
   });
 
@@ -39,6 +42,7 @@ export default function UsersForm() {
           name: user.name || "",
           lastname: user.lastname || "",
           email: user.email || "",
+          password: user.password || "",
           age: user.age || "",
         });
       } else {
@@ -126,6 +130,23 @@ export default function UsersForm() {
               <ErrorMessage name="age" component="div" className="text-red-500 text-sm mt-1" />
             </div>
 
+            <div className="field col-12">
+              <label htmlFor="age" className="block text-900 font-medium mb-2">
+                Contra
+              </label>
+              <Field
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Contraseña del usuario"
+                className="p-inputtext p-component"
+              />
+              <ErrorMessage name="age" component="div" className="text-red-500 text-sm mt-1" />
+            </div>
+            <div className="field col-12">
+              <label htmlFor="age" className="block text-900 font-medium mb-2">
+                ______________________________________
+              </label>
+            </div>
             <div className="col-12 flex justify-content-between mt-4">
               <Button
                 type="submit"
@@ -145,3 +166,4 @@ export default function UsersForm() {
     </div>
   );
 }
+

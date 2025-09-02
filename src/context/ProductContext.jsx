@@ -1,83 +1,114 @@
 import { createContext, useState, useEffect, useContext } from "react";
-import axios from 'axios';
+import axios from "axios";
 
 export const ProductContext = createContext();
 
+const API_URL = "http://localhost:3000/productos";
+
 export const ProductProvider = ({ children }) => {
-    const [products, setProducts] = useState([]);
-    
-    const API_URL = "http://localhost:3000/productos";
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const getProducts = async () => {
-        try {
-            const { data } = await axios.get(API_URL);
-            const productList = Array.isArray(data?.data) ? data.data : data;
-            setProducts(productList);
-        } catch (error) {
-            console.error("Error al obtener productos", error);
-            alert("Error al obtener los productos.");
-        }
-    };
-
-    const addProduct = async ({ name, price, color }) => {
-        try {
-            const { data } = await axios.post(API_URL, {
-                name, price, color,
-            });
-            const created = Array.isArray(data?.data) ? data.data[0] : data.data || data;
-            setProducts((prevProducts) => [...prevProducts, created]);
-        } catch (error) {
-            console.error("Error al añadir el producto", error);
-            alert("Error al añadir el producto.");
-        }
-    };
-
-    const editProduct = async (id, { name, price, color }) => {
+  // Obtiene productos
+  const getProducts = async () => {
+    setLoading(true);
+    setError(null);
     try {
-        await axios.put(`${API_URL}/${id}`, {
-            name, price, color,
-        });
-        setProducts((prev) =>
-            prev.map((p) =>
-                p.id === id ? { ...p, name, price, color } : p
-            )
-        );
-    } catch (error) {
-        alert("Error al editar producto");
-        console.error(error);
+      const token = localStorage.getItem("token"); // opcional si tu backend usa JWT
+      const { data: responseData } = await axios.get(API_URL, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      console.log("Respuesta productos:", responseData);
+
+      setProducts(Array.isArray(responseData.data) ? responseData.data : []);
+    } catch (e) {
+      setError(e.response?.data?.message || e.message);
+      console.error("Error fetching products:", e.response || e);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Agrega un producto
+  const addProduct = async (newProduct) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("token");
+      const { data: responseData } = await axios.post(API_URL, newProduct, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      const created =
+        Array.isArray(responseData.data) ? responseData.data[0] : responseData.data || responseData;
+
+      setProducts((prev) => (Array.isArray(prev) ? [...prev, created] : [created]));
+    } catch (e) {
+      setError(e.response?.data?.message || e.message);
+      console.error("Error adding product:", e.response || e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Edita un producto
+  const editProduct = async (id, updated) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.put(`${API_URL}/${id}`, updated, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      setProducts((prev) =>
+        prev.map((p) => (p.id === id ? { ...updated, id } : p))
+      );
+    } catch (e) {
+      setError(e.response?.data?.message || e.message);
+      console.error("Error editing product:", e.response || e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Elimina un producto
+  const deleteProduct = async (id) => {
+    setError(null);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+    } catch (e) {
+      setError(e.response?.data?.message || e.message);
+      console.error("Error deleting product:", e.response || e);
+    }
+  };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
+
+  return (
+    <ProductContext.Provider
+      value={{
+        products,
+        loading,
+        error,
+        getProducts,
+        addProduct,
+        editProduct,
+        deleteProduct,
+      }}
+    >
+      {children}
+    </ProductContext.Provider>
+  );
 };
 
-
-    const deleteProduct = async (id) => {
-        try {
-            await axios.delete(`${API_URL}/${id}`);
-            setProducts((prevProducts) => prevProducts.filter((product) => product.id !== id));
-        } catch (error) {
-            console.error("Error al eliminar el producto", error);
-            alert("Error al eliminar el producto.");
-        }
-    };
-
-    useEffect(() => {
-        getProducts();
-    }, []);
-
-    return (
-        <ProductContext.Provider
-            value={{
-                products,
-                getProducts,
-                addProduct,
-                editProduct,
-                deleteProduct,
-            }}
-        >
-            {children}
-        </ProductContext.Provider>
-    );
-};
-
-export const useProductContext = () => {
-    return useContext(ProductContext);
-};
+// Hook para usar el contexto
+export const useProductContext = () => useContext(ProductContext);
